@@ -1,0 +1,50 @@
+{% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'DanTalkMain/css/style.css' %}">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!--나눔고딕-->
+    <link href="https://fonts.googleapis.com/css?family=Nanum+Gothic&display=swap" rel="stylesheet">
+<body style="background-color: #F5F6F7;">
+<div id="mainwidth" >
+    <nav class="site-header sticky-top" style="background-color:#4d4d4d; padding-top:8px; padding-bottom:8px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-2" onclick="location.href='{% url 'DanTalkMain:main' %}'">
+                    <label style="color:white; font-size:25px; cursor:pointer;">단톡방</label><label style="font-size:10px; color:white;">BETA</label>
+                </div>
+                <div class="col-md-6">
+                </div>
+                <div class="col-md-4" style="padding-top:5px;">
+                    {% if request.session.rank == '1' %}
+                        <button type="button" class="btn btn-sm" style="background-color:#1E90FF;" onclick="location.href='{% url 'DanTalkMain:admin_main' %}'">관리자</button>
+                        <button type="button" class="btn btn-light btn-sm" onclick="location.href='{% url 'DanTalkMain:logout' %}'">로그아웃</button>
+                    {% elif request.session.dantalk_id %}
+                        <a style="color:#FFFFFF; cursor:pointer;" href="{% url 'DanTalkMain:to_usr_pw_modify' %}">{{request.session.dantalk_id}}님 </a>
+                        <button type="button" class="btn btn-sm" style="background-color:#FFFF33;" onclick="location.href='{% url 'DanTalkMain:to_add_friend_list' %}'">친구 관리</button>
+                        <button type="button" class="btn btn-sm" style="background-color:#1E90FF;" onclick="location.href='{% url 'DanTalkMain:index' %}'">대화방 관리</button>
+                        <button type="button" class="btn btn-light btn-sm" onclick="location.href='{% url 'DanTalkMain:logout' %}'">로그아웃</button>
+                    {% else %}
+                        <button type="button" class="btn btn-light btn-sm" style="margin-left:40px;" onclick="location.href='{% url 'DanTalkMain:loginpage' %}'">로그인</button>
+                        <button type="button" class="btn btn-sm" style="background-color:#FFFF33;" onclick="location.href='{% url 'DanTalkMain:toSignUp' %}'">회원가입</button>
+                    {% endif %}
+                </div>
+            </div>        
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8"> 
+                <div><img src="{% static 'DanTalkMain/img/email.png' %}" style="margin-left:50px; width:600px; margin-top:50px;"></div>
+                <div style="font-size:25px; margin-top:50px; margin-left:50px;">아이디가 메일로 전송 되었습니다. 메일을 확인해 주세요!</div>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

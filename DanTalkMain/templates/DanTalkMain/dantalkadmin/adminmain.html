@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!--나눔고딕-->
+<link href="https://fonts.googleapis.com/css?family=Nanum+Gothic&display=swap" rel="stylesheet">
+<!--오류 발생 알람메시지-->
+{% if messages %}
+    {% for message in messages %} 
+        <script>alert("{{message}}");</script>
+    {% endfor %}
+{% endif %}
+<!--알람 끝-->
+</head>
+<body style="background-color: #F5F6F7;">
+<div id="mainwidth" >
+    <nav class="site-header sticky-top" style="background-color:#4d4d4d; padding-top:8px; padding-bottom:8px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-2" onclick="location.href='{% url 'DanTalkMain:main' %}'">
+                    <label style="color:white; font-size:25px; cursor:pointer;">단톡방</label><label style="font-size:10px; color:white;">BETA</label>
+                </div>
+                <div class="col-md-6">
+                </div>
+                <div class="col-md-4" style="padding-top:5px;">
+                    {% if request.session.rank == '1' %}
+                        <button type="button" class="btn btn-sm" style="background-color:#1E90FF;" onclick="location.href='{% url 'DanTalkMain:admin_main' %}'">관리자</button>
+                        <button type="button" class="btn btn-light btn-sm" onclick="location.href='{% url 'DanTalkMain:logout' %}'">로그아웃</button>
+                    {% elif request.session.dantalk_id %}
+                        <a style="color:#FFFFFF; cursor:pointer;" href="{% url 'DanTalkMain:to_usr_pw_modify' %}">{{request.session.dantalk_id}}님 </a>
+                        <button type="button" class="btn btn-sm" style="background-color:#FFFF33;" onclick="location.href='{% url 'DanTalkMain:to_add_friend_list' %}'">친구 관리</button>
+                        <button type="button" class="btn btn-sm" style="background-color:#1E90FF;" onclick="location.href='{% url 'DanTalkMain:index' %}'">대화방 관리</button>
+                        <button type="button" class="btn btn-light btn-sm" onclick="location.href='{% url 'DanTalkMain:logout' %}'">로그아웃</button>
+                    {% else %}
+                        <button type="button" class="btn btn-light btn-sm" style="margin-left:40px;" onclick="location.href='{% url 'DanTalkMain:loginpage' %}'">로그인</button>
+                        <button type="button" class="btn btn-sm" style="background-color:#FFFF33;" onclick="location.href='{% url 'DanTalkMain:toSignUp' %}'">회원가입</button>
+                    {% endif %}
+                </div>
+            </div>        
+        </div>
+    </nav>
+    <div class="container">
+        <label style="font-size:55px; font-weight:600; margin-top:20px;">관리</label>
+        <div class="row">
+            <div class="col-md-6" style="margin-top:50px;">
+            <label style="font-size:33px; font-weight:600; margin-bottom:20px;">인원 관리</label><br>
+            <input type="text" id="friend_find" name="friend_find" style="position:relative; left:1%; width:480px; height:50px;" placeholder="찾으실 ID를 입력하세요">
+            <img src="{% static 'DanTalkMain/img/searching.png'%}" id="search" style="position:relative; width:50px; height:50px; cursor:pointer;">
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                    <th scope="col" style="font-size:33px;">인원 목록</th>
+                    </tr>
+                </thead>
+                <tbody id="find_result" style="background-color:#DCDCDC; text-align:center;">
+                    {% for usr in user_list %}
+                        <tr>
+                            <td id="td{{usr.id}}">{{usr.DanTalk_ID}}<button type="button" onclick="location.href='{% url 'DanTalkMain:to_usr_pw_modify_admin' usr.DanTalk_ID%}'" class="btn btn-primary" style="margin-left:10px;">수정</button><button type="button" id="buttondelete{{usr.id}}" onclick="usr_delete(this.id)" class="btn btn-danger" style="margin-left:10px;">삭제</button></td>
+                        </tr>    
+                    {% endfor %}
+                </tbody>
+            </table>
+            현재 가입된 인원 수 : {{usr_count}}     
+            </div>
+            <div class="col-md-6" style="margin-top:50px;">
+            <label style="font-size:33px; font-weight:600; margin-bottom:20px;">대화방 관리</label><br>
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                    <th scope="col" style="font-size:33px;">현재 생성된 대화방 목록</th>
+                    </tr>
+                </thead>
+                <tbody style="background-color:#DCDCDC; text-align:center;">
+                    {% for dantalkroom in dantalkroom_list %}
+                        <tr>
+                            <td id="td{{dantalkroom.id}}">{{dantalkroom.DanTalkRoom_Name}}({{dantalkroom.DanTalkRoom_UsrList}})</td>
+                        </tr>    
+                    {% endfor %}
+                </tbody>
+            </table>
+            현재 생성된 대화방 수 : {{talk_count}}   
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $("#search").click(function() {
+        var friend_id = $("#friend_find").val();
+        $.ajax({
+            type : "POST",
+            url : "{% url 'DanTalkMain:findFriend' %}",
+            data : {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'friend_id': friend_id,
+                },
+             success : function(response)
+            {
+                if(response.msg == 'Y')
+                {
+                    $("#find_result").empty();
+                    var addtrstart = "<tr>"
+                    var addtrend = "</tr>"
+                    var index = 1;
+                    for(i=0; i<response.user_id_list.length; i++){
+                        var addfriendidtd = "<td id='friend_id"+index+"'>"+response.user_id_list[i]+"<button type='button' id='buttonmodify"+index+"' onclick='friend_delete(this.id)' class='btn btn-primary' style='margin-left:10px;'>수정</button><button type='button' id='buttondelete"+index+"' onclick='usr_delete(this.id)' class='btn btn-danger' style='margin-left:10px;'>삭제</button></td>";
+                        
+                        addtrstart += addfriendidtd 
+                        addtrstart += addtrend
+                                            
+                        document.getElementById("find_result").innerHTML=addtrstart;
+                                          
+                        index=index+1;
+                    }
+                }else{
+                    alert("검색한 ID가 존재하지 않습니다.");
+                }
+            },
+            error : function(a, b, c)
+            {
+                alert(a + " " + b + " " + c);
+            }
+        });
+    });
+
+    function usr_delete(button_id){
+        var friend_ = button_id.replace("buttondelete", "");
+        var friend__ = $("#td"+friend_).text();
+        var friend_id = friend__.replace("수정삭제", "");
+         $.ajax({
+				type : "POST",
+				url : "{% url 'DanTalkMain:usrDelete' %}",
+				data : {
+					'csrfmiddlewaretoken': '{{ csrf_token }}',
+					'friend_id' : friend_id,
+				},
+				success : function(response)
+				{
+					alert("유저 삭제 완료");
+				},
+                error : function(request, status, error ){
+                    alert("유저 삭제 실패");
+                },
+		    });
+    }
+</script>
+</body>
